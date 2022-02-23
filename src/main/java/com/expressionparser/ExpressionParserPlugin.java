@@ -27,13 +27,13 @@ public class ExpressionParserPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Expression Parser started!");
+		/* log.info("Expression Parser started!"); */
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.info("Expression Parser stopped!");
+		/* log.info("Expression Parser stopped!"); */
 	}
 
 	@Subscribe

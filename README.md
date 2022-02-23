@@ -1,2 +1,2 @@
 ### RuneLite Expression-Evaluator
-A runelite plugin that solves mathematic equations in chat messages.
+A runelite plugin that solves mathematics equations in chat messages.
