@@ -9,11 +9,11 @@ public interface ExpressionParserConfig extends Config
 {
 	@ConfigItem(
 		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+		name = "On-Start message",
+		description = "Display plugin description on client login"
 	)
 	default String greeting()
 	{
-		return "Hello";
+		return "An expression parsing plugin.";
 	}
 }
