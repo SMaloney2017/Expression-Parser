@@ -1,0 +1,72 @@
+PARSER_BEGIN(ExpressionParser)
+
+package com.expressionparser;
+public class ExpressionParser{}
+
+PARSER_END(ExpressionParser)
+
+TOKEN : {
+      < PLUS: "+" >
+    | < MINUS: "-" >
+    | < MUL: "*" >
+    | < DIV: "/" >
+    | < LPAREN: "(" >
+    | < RPAREN: ")" >
+}
+
+TOKEN : {
+      < INT: ( <DIGIT> )+ >
+    | < #DIGIT: ["0" - "9"] >
+}
+
+SKIP : {
+	" "
+	| "\t"
+	| "\r"
+}
+
+float Expression():
+{ float r = 0; }
+{
+    r = Sum()
+    { return r; }
+}
+
+float Sum():
+{ float t = 0; float t2 = 0; }
+{
+    t = Term()
+    (
+        (
+              <PLUS> t2 = Term() { t += t2; }
+            | <MINUS> t2 = Term() { t -= t2; }
+        )
+    )*
+    { return t; }
+}
+
+float Term():
+{ float e = 0; float e2 = 0; }
+{
+    e = Element()
+    (
+        (
+              <MUL> e2 = Element() { e *= e2; }
+            | <DIV> e2 = Element() { e /= e2; }
+        )
+    )*
+    { return e; }
+}
+
+float Element():
+{ float f = 0; Token t; Float x; }
+{
+    (
+        t = <INT> {
+            x = new Float(t.image);
+            f = x;
+        }
+        | <LPAREN> f = Sum() <RPAREN>
+    )
+    { return f; }
+}
