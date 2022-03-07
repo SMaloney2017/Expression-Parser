@@ -1,9 +1,9 @@
-PARSER_BEGIN(ExpressionParser)
+PARSER_BEGIN(JavaCCExpressions)
 
-package com.expressionparser;
-public class ExpressionParser{}
+package com.expressionparser.javacc;
+public class JavaCCExpressions{}
 
-PARSER_END(ExpressionParser)
+PARSER_END(JavaCCExpressions)
 
 TOKEN : {
       < PLUS: "+" >
