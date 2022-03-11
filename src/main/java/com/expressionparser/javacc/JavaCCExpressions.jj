@@ -1,7 +1,7 @@
 PARSER_BEGIN(JavaCCExpressions)
 
 package com.expressionparser.javacc;
-public class JavaCCExpressions{}
+public class JavaCCExpressions{ }
 
 PARSER_END(JavaCCExpressions)
 
@@ -10,12 +10,27 @@ TOKEN : {
     | < MINUS: "-" >
     | < MUL: "*" >
     | < DIV: "/" >
+    | < MOD: "%" >
+    | < POWER: "^" >
+    | < NOT: "!" >
+    | < EQUALS: "=" >
+    | < LESSTHAN: "<" >
+    | < GREATERTHAN: ">" >
+    | < LESSTHANEQUALS: "<=" >
+    | < GREATERTHANEQUALS: ">=" >
+    | < AND: "&&" >
+    | < OR: "||" >
     | < LPAREN: "(" >
     | < RPAREN: ")" >
 }
 
 TOKEN : {
-      < INT: ( <DIGIT> )+ >
+      < INT: (<DIGIT>)+ >
+    | < FLOAT:
+          (<DIGIT>)+ "." (<DIGIT>)*
+        | "." (<DIGIT>)+
+        | (<DIGIT>)+
+      >
     | < #DIGIT: ["0" - "9"] >
 }
 
@@ -25,48 +40,186 @@ SKIP : {
 	| "\r"
 }
 
+float Start():
+{ }
+{
+    try {
+        (
+              Expression() <EOF>
+            | <EOF>
+        )
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
 float Expression():
-{ float r = 0; }
+{ }
 {
-    r = Sum()
-    { return r; }
+    try {
+        OrExpression()
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
 }
 
-float Sum():
-{ float t = 0; float t2 = 0; }
+float OrExpression():
+{ }
 {
-    t = Term()
-    (
+    try {
+        AndExpression()
         (
-              <PLUS> t2 = Term() { t += t2; }
-            | <MINUS> t2 = Term() { t -= t2; }
-        )
-    )*
-    { return t; }
+            <OR>
+            AndExpression()
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
 }
 
-float Term():
-{ float e = 0; float e2 = 0; }
+float AndExpression():
+{ }
 {
-    e = Element()
-    (
+    try {
+        EqualsExpression()
         (
-              <MUL> e2 = Element() { e *= e2; }
-            | <DIV> e2 = Element() { e /= e2; }
-        )
-    )*
-    { return e; }
+            <AND>
+            EqualsExpression()
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
 }
 
-float Element():
-{ float f = 0; Token t; Float x; }
+float EqualsExpression():
+{ }
 {
-    (
-        t = <INT> {
-            x = new Float(t.image);
-            f = x;
-        }
-        | <LPAREN> f = Sum() <RPAREN>
-    )
-    { return f; }
+    try {
+        RelationalExpression()
+        (
+            (
+                <NOT> <EQUALS>
+                RelationalExpression()
+            )
+            | (
+                <EQUALS> <EQUALS>
+                RelationalExpression()
+            )
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float RelationalExpression():
+{ }
+{
+    try {
+        AdditiveExpression()
+        (
+              <LESSTHAN> AdditiveExpression()
+            | <GREATERTHAN> AdditiveExpression()
+            | <LESSTHANEQUALS> AdditiveExpression()
+            | <GREATERTHANEQUALS> AdditiveExpression()
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float AdditiveExpression():
+{ }
+{
+    try {
+        MultiplicativeExpression()
+        (
+            (
+                <PLUS>
+                MultiplicativeExpression()
+            )
+            | (
+                <MINUS>
+                MultiplicativeExpression()
+            )
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float MultiplicativeExpression():
+{ }
+{
+    try {
+        UnaryExpression()
+        (
+              <MUL> UnaryExpression()
+            | <DIV> UnaryExpression()
+            | <MOD> UnaryExpression()
+        )*
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float UnaryExpression():
+{ }
+{
+    try {
+        (
+              <PLUS> UnaryExpression()
+            | <MINUS> UnaryExpression()
+            | <NOT> UnaryExpression()
+            | PowerExpression()
+        )
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float PowerExpression():
+{ }
+{
+    try {
+        Fragment()
+        (
+            <POWER> UnaryExpression()
+        )?
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
+}
+
+float Fragment():
+{ }
+{
+    try {
+          <INT>
+        | <FLOAT>
+        | <LPAREN> Expression() <RPAREN>
+        { return; }
+    } catch(ParseException e) {
+        error(e);
+        return null;
+    }
 }
