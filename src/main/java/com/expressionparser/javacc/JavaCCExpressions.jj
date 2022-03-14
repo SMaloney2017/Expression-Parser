@@ -1,7 +1,6 @@
 PARSER_BEGIN(JavaCCExpressions)
 
 package com.expressionparser.javacc;
-import com.expressionparser.Syntax.*;
 public class JavaCCExpressions{ }
 
 PARSER_END(JavaCCExpressions)
