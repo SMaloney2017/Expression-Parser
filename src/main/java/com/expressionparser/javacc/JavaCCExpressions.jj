@@ -167,7 +167,8 @@ float MultiplicativeExpression():
     try {
         UnaryExpression()
         (
-              <MUL> UnaryExpression()
+              PowerExpression()
+            | <MUL> UnaryExpression()
             | <DIV> UnaryExpression()
             | <MOD> UnaryExpression()
         )*
