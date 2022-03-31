@@ -1,0 +1,113 @@
+options {
+  STATIC = false;
+}
+
+PARSER_BEGIN(Expressions)
+
+package com.expressionparser.javacc;
+import java.lang.Math;
+public class Expressions {
+
+}
+
+PARSER_END(Expressions)
+
+TOKEN : {
+      < PLUS: "+" >
+    | < MINUS: "-" >
+    | < MUL: "*" >
+    | < DIV: "/" >
+    | < MOD: "%" >
+    | < POWER: "^" >
+    | < LPAREN: "(" >
+    | < RPAREN: ")" >
+}
+
+TOKEN : {
+      < INT: (<DIGIT>)+ >
+    | < FLOAT:
+          (<DIGIT>)+ "." (<DIGIT>)*
+        | "." (<DIGIT>)+
+        | (<DIGIT>)+
+      >
+    | < #DIGIT: ["0" - "9"] >
+}
+
+SKIP : {
+	" "
+	| "\t"
+	| "\r"
+}
+
+public float Start():
+{ float f = 0; }
+{
+    (
+          f = Expression() <EOF>
+        | <EOF>
+    )
+    { return f; }
+}
+
+float Expression():
+{ float f = 0; }
+{
+    f = AdditiveExpression()
+    { return f; }
+}
+
+float AdditiveExpression():
+{ float f = 0, f1 = 0; }
+{
+    f = MultiplicativeExpression()
+    (
+          <PLUS> f1 = MultiplicativeExpression() { f = f + f1; }
+        | <MINUS> f1 = MultiplicativeExpression() { f = f - f1; }
+    )*
+    { return f; }
+}
+
+float MultiplicativeExpression():
+{ float f = 0, f1 = 0; }
+{
+    f = UnaryExpression()
+    (
+          f1 = PowerExpression()
+        | <MUL> f1 = UnaryExpression() { f = f * f1; }
+        | <DIV> f1 = UnaryExpression() { f = f / f1; }
+        | <MOD> f1 = UnaryExpression() { f = f % f1; }
+    )*
+    { return f; }
+}
+
+float UnaryExpression():
+{ float f = 0; }
+{
+    (
+          <PLUS> f = UnaryExpression()
+        | <MINUS> f = UnaryExpression() { f = f * -1; }
+        | f = PowerExpression()
+    )
+    { return f; }
+}
+
+float PowerExpression():
+{ float f = 0, f1 = 0; }
+{
+    f = Fragment()
+    (
+        <POWER> f1 = UnaryExpression() { f = (float)Math.pow(f, f1); }
+    )?
+    { return f; }
+}
+
+float Fragment():
+{ Token t; float f = 0;}
+{
+    (
+          t = <INT> { f = Float.parseFloat(t.image); }
+        | t = <FLOAT> { f = Float.parseFloat(t.image); }
+        | <LPAREN> f = Expression() <RPAREN>
+    )
+    { return f; }
+}
