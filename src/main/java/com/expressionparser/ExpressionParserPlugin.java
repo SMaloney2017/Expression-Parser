@@ -62,7 +62,7 @@ public class ExpressionParserPlugin extends Plugin
                 eval.ReInit(new ByteArrayInputStream(message.getBytes()));
             }
             result = eval.Start();
-            log.info(String.valueOf(result));
+            /* log.info(String.valueOf(result)); */
             String redrawMessage = new ChatMessageBuilder()
                     .append(ChatColorType.NORMAL)
                     .append(message)
